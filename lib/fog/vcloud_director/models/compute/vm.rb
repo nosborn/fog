@@ -68,6 +68,11 @@ module Fog
           service.vm_networks.new(data)
         end
 
+        def networks
+          requires :id
+          service.vm_networks(:vm => self)
+        end
+
         def disks
           requires :id
           service.disks(:vm => self)
