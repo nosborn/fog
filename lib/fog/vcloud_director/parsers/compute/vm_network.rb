@@ -66,7 +66,9 @@ module Fog
         class VmNetwork < VcloudDirectorParser
 
           def reset
-            @response = { }
+            @network_connection = {}
+            @in_network_connection = false
+            @response = { :network_connections => [] }
           end
 
           def start_element(name, attributes)
@@ -79,27 +81,32 @@ module Fog
               @response[:id] = @response[:href].split('/')[-2]
             when 'NetworkConnection'
               network_connection = extract_attributes(attributes)
-              @response[:network] = network_connection[:network]
-              @response[:needs_customization] = ( network_connection[:needsCustomization] == "true" )
+              @network_connection[:network] = network_connection[:network]
+              @network_connection[:needs_customization] =
+                (network_connection[:needsCustomization] == "true")
             end
           end
 
           def end_element(name)
             case name
-            when 'Info'
-              @response[:info] = value
             when 'PrimaryNetworkConnectionIndex'
               @response[:primary_network_connection_index] = value.to_i
+
+            when 'NetworkConnection'
+              @response[:network_connections] << @network_connection
+              @network_connection = {}
+              @in_network_connection = false
+
             when 'NetworkConnectionIndex'
-              @response[:network_connection_index] = value.to_i
+              @network_connection[:network_connection_index] = value.to_i
             when 'IpAddress'
-              @response[:ip_address] = value
+              @network_connection[:ip_address] = value
             when 'IsConnected'
-              @response[:is_connected] = (value == "true")
+              @network_connection[:is_connected] = (value == "true")
             when 'MACAddress'
-              @response[:mac_address] = value
+              @network_connection[:mac_address] = value
             when 'IpAddressAllocationMode'
-              @response[:ip_address_allocation_mode] = value
+              @network_connection[:ip_address_allocation_mode] = value
             end
           end
 

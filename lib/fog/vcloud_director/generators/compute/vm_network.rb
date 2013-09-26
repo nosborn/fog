@@ -43,11 +43,7 @@ module Fog
           end
 
           def generate_xml
-            output = ""
-            output << header
-            output << body(@attrs)
-            output << tail
-            output
+            header << body(@attrs) << tail
           end
 
           def network
@@ -83,35 +79,43 @@ module Fog
           end
 
           def header
-              '<NetworkConnectionSection xmlns="http://www.vmware.com/vcloud/v1.5"
-                 xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"
-                 type="application/vnd.vmware.vcloud.networkConnectionSection+xml"
-                 ovf:required="false"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://schemas.dmtf.org/ovf/envelope/1
-                   http://schemas.dmtf.org/ovf/envelope/1/dsp8023_1.1.0.xsd
-                   http://www.vmware.com/vcloud/v1.5 http://10.194.1.65/api/v1.5/schema/master.xsd">'
-
+            <<-END
+            <NetworkConnectionSection xmlns="http://www.vmware.com/vcloud/v1.5"
+              xmlns:ovf="http://schemas.dmtf.org/ovf/envelope/1"
+              type="application/vnd.vmware.vcloud.networkConnectionSection+xml"
+              ovf:required="false"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://schemas.dmtf.org/ovf/envelope/1
+                http://schemas.dmtf.org/ovf/envelope/1/dsp8023_1.1.0.xsd
+                http://www.vmware.com/vcloud/v1.5 http://10.194.1.65/api/v1.5/schema/master.xsd">
+            END
           end
 
           def body(opts={})
-            body = <<EOF
+            body = <<-END
             <ovf:Info>#{opts[:info]}</ovf:Info>
                  <PrimaryNetworkConnectionIndex>#{opts[:primary_network_connection_index]}</PrimaryNetworkConnectionIndex>
-                 <NetworkConnection
-                     network="#{opts[:network]}"
-                     needsCustomization="#{opts[:needs_customization]}">
-                     <NetworkConnectionIndex>#{opts[:network_connection_index]}</NetworkConnectionIndex>
-                     <IpAddress>#{opts[:ip_address]}</IpAddress>
-                     <IsConnected>#{opts[:is_connected]}</IsConnected>
-                     <MACAddress>#{opts[:mac_address]}</MACAddress>
-                     <IpAddressAllocationMode>#{opts[:ip_address_allocation_mode]}</IpAddressAllocationMode>
-                 </NetworkConnection>
-EOF
+            END
+            opts[:network_connections].each do |network_connection|
+              body += <<-END
+                <NetworkConnection
+                  network="#{network_connection[:network]}"
+                  needsCustomization="#{network_connection[:needs_customization]}">
+                  <NetworkConnectionIndex>#{network_connection[:network_connection_index]}</NetworkConnectionIndex>
+                  <IpAddress>#{network_connection[:ip_address]}</IpAddress>
+                  <IsConnected>#{network_connection[:is_connected]}</IsConnected>
+                  <MACAddress>#{network_connection[:mac_address]}</MACAddress>
+                  <IpAddressAllocationMode>#{network_connection[:ip_address_allocation_mode]}</IpAddressAllocationMode>
+                </NetworkConnection>
+              END
+            end
+            body
           end
 
           def tail
-            '</NetworkConnectionSection>'
+            <<-END
+            </NetworkConnectionSection>
+            END
           end
 
         end
