@@ -111,21 +111,14 @@ module Fog
             }
           end.to_xml
 
-          begin
-            request(
-              :body    => body,
-              :expects => 201,
-              :headers => {'Content-Type' => 'application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml'},
-              :method  => 'POST',
-              :parser  => Fog::ToHashDocument.new,
-              :path    => "vdc/#{id}/action/instantiateVAppTemplate"
-            )
-          rescue Fog::Compute::VcloudDirector::BadRequest => e
-            if e.minor_error_code == 'DUPLICATE_NAME'
-              raise Fog::Compute::VcloudDirector::DuplicateName.new(e.message)
-            end
-            raise
-          end
+          request(
+            :body    => body,
+            :expects => 201,
+            :headers => {'Content-Type' => 'application/vnd.vmware.vcloud.instantiateVAppTemplateParams+xml'},
+            :method  => 'POST',
+            :parser  => Fog::ToHashDocument.new,
+            :path    => "vdc/#{id}/action/instantiateVAppTemplate"
+          )
         end
       end
     end

@@ -395,7 +395,13 @@ module Fog
           })
         rescue Excon::Errors::HTTPStatusError => error
           raise case error
-          when Excon::Errors::BadRequest   then BadRequest.slurp(error);
+          when Excon::Errors::BadRequest
+            bad_request = BadRequest.slurp(error)
+            case bad_request.minor_error_code
+            when 'BUSY_ENTITY'    then BusyEntity.new(bad_request.message);
+            when 'DUPLICATE_NAME' then DuplicateName.new(bad_request.message);
+            else                       bad_request
+            end
           when Excon::Errors::Unauthorized then Unauthorized.slurp(error);
           when Excon::Errors::Forbidden    then Forbidden.slurp(error);
           when Excon::Errors::Conflict     then Conflict.slurp(error);

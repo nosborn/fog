@@ -23,23 +23,14 @@ module Fog
         # @see https://pubs.vmware.com/vcd-51/topic/com.vmware.vcloud.api.reference.doc_51/doc/operations/POST-ConfigureEdgeGatewayServices.html
         # @since vCloud API version 5.1
         def post_configure_edge_gateway_services(id, configuration)
-          body = Fog::Generators::Compute::VcloudDirector::EdgeGatewayServiceConfiguration.new(configuration).generate_xml
-
-          begin
-            request(
-              :body    => body,
-              :expects => 202,
-              :headers => {'Content-Type' => 'application/vnd.vmware.admin.edgeGatewayServiceConfiguration+xml'},
-              :method  => 'POST',
-              :parser  => Fog::ToHashDocument.new,
-              :path    => "admin/edgeGateway/#{id}/action/configureServices"
-            )
-          rescue Fog::Compute::VcloudDirector::BadRequest => e
-            if e.minor_error_code == 'BUSY_ENTITY'
-              raise Fog::Compute::VcloudDirector::BusyEntity.new(e.message)
-            end
-            raise
-          end
+          request(
+            :body    => body,
+            :expects => 202,
+            :headers => {'Content-Type' => 'application/vnd.vmware.admin.edgeGatewayServiceConfiguration+xml'},
+            :method  => 'POST',
+            :parser  => Fog::ToHashDocument.new,
+            :path    => "admin/edgeGateway/#{id}/action/configureServices"
+          )
         end
       end
 
