@@ -40,6 +40,7 @@ module Fog
       class Forbidden < Fog::VcloudDirector::Errors::Forbidden; end
       class Conflict < Fog::VcloudDirector::Errors::Conflict; end
 
+      class BusyEntity < Fog::VcloudDirector::Errors::BusyEntity; end
       class DuplicateName < Fog::VcloudDirector::Errors::DuplicateName; end
       class TaskError < Fog::VcloudDirector::Errors::TaskError; end
 
